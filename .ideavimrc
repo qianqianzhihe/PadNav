@@ -1,0 +1,324 @@
+﻿
+" ================================================================================================
+" = Extensions ===================================== chenml
+" ================================================================================================
+Plug 'tpope/vim-surround'
+Plug 'preservim/nerdtree'
+" Plug 'vim-multiple-cursors'
+" 添加 Which-Key 插件
+Plug 'liuchengxu/vim-which-key'
+
+map <D-b> <A-n>
+map mx <A-x>
+map mv <A-p>
+
+" ================================================================================================
+" = Basic settings =====================================
+" ================================================================================================
+set clipboard=
+set ignorecase
+set scrolloff=30
+set history=200
+
+set number
+set relativenumber
+
+set incsearch
+set hlsearch
+set keep-english-in-normal
+set multiple-cursors
+" 启用插入-普通模式
+set ideavim.useinsertmode
+
+" 跳转插件
+set matchit
+
+" --- 命令模式增强 ---
+
+" 1. 开启命令补全菜单
+set wildmenu
+
+" 2. 设置补全模式为：列表显示，且显示完整
+" 当你按 Tab 键时，会列出所有匹配的命令
+set wildmode=list:full
+
+" 3. 【重要】让菜单以“弹窗 (Popup Menu)”的形式出现
+" 这样看起来就像 IDE 的代码提示一样，而不是在底部挤成一行
+set wildoptions=pum
+
+" ideavim settings =======================================
+
+
+" bookmark
+nmap mm <action>(ToggleBookmark)
+nmap ma mA
+nmap 'a 'A
+
+nmap mb mB
+nmap 'b 'B
+
+nmap mc mC
+nmap 'c 'C
+
+nmap md mD
+nmap 'd 'D
+
+" 前后移动table标签
+nmap L <action>(NextTab)
+nmap H <action>(PreviousTab)
+
+" --- 方法跳转优化 ---
+
+" ]m : 跳转到 [下] 一个方法 (对应 IDE 的 Next Method)
+nmap ]m <action>(MethodDown)
+
+" [m : 跳转到 [上] 一个方法 (对应 IDE 的 Previous Method)
+nmap [m <action>(MethodUp)
+
+" ]e : 跳转到 [下] 一个错误/警告 (Error)
+nmap ]e <action>(GotoNextError)
+
+" [e : 跳转到 [上] 一个错误/警告
+nmap [e <action>(GotoPreviousError)
+
+" ]c : 跳转到 [下] 一处 Git 修改 (Change)
+nmap ]c <action>(VcsShowNextChangeMarker)
+
+" [c : 跳转到 [上] 一处 Git 修改
+nmap [c <action>(VcsShowPrevChangeMarker)
+
+" ================================================================================================
+" = Leader Keymaps =====================================
+" ================================================================================================
+" leaderkey
+let mapleader=" "
+
+" [Normal模式] <leader>p : 粘贴 0 号寄存器 (坚挺的粘贴)
+nnoremap <leader>np "0p
+nnoremap <leader>nP "0P
+
+vnoremap <leader>vp "0p
+vnoremap <leader>vP "0P
+" ==================================================
+" = 🪟 窗口大小调整 (无冲突版)
+" = 操作方式：先按 Esc，然后按一下 空格，紧接着按方向键
+" ==================================================
+
+" 空格 + 右箭头：向右拉伸
+nmap <leader><Right> <action>(StretchSplitToRight)
+
+" 空格 + 左箭头：向左拉伸
+nmap <leader><Left> <action>(StretchSplitToLeft)
+
+" 空格 + 上箭头：向上拉伸
+nmap <leader><Up> <action>(StretchSplitToTop)
+
+" 空格 + 下箭头：向下拉伸
+nmap <leader><Down> <action>(StretchSplitToBottom)
+
+" ====================================================================
+" = 📋 复制与粘贴策略 (Copy & Paste) =
+" = 策略：
+" = 1. y/d/p      -> 仅在 Vim 内部生效 (" 寄存器)
+" = 2. <leader>y/p -> 与系统剪切板交互 (+ 寄存器)
+" ====================================================================
+
+" --- 0. 核心设置：断开 Vim 与系统的默认关联 ---
+" 这一行至关重要！确保 Vim 的 y 操作不写入系统剪切板
+set clipboard=
+
+" --- 1. 复制到系统剪切板 (Copy TO System) ---
+" [Visual] 选中部分 -> 系统剪切板
+vnoremap <leader>y "+y
+
+" [Normal] 当前行 -> 系统剪切板
+nnoremap <leader>Y "+yy
+
+" [Normal] 动作组合 -> 系统剪切板 (如 <leader>yiw 复制单词)
+nnoremap <leader>y "+y
+
+
+" --- 2. 从系统剪切板粘贴 (Paste FROM System) ---
+" [Normal] 粘贴到光标后
+nnoremap <leader>p "+p
+
+" [Normal] 粘贴到光标前
+nnoremap <leader>P "+P
+
+" 选中部分粘贴
+vnoremap <leader>p "+P
+
+" --- 3. 插入模式 (Insert Mode) ---
+" Ctrl+v 粘贴系统剪切板内容 (符合 Windows 习惯)
+inoremap <C-v> <C-r>+
+
+" Ctrl+p 粘贴 Vim 刚才 y 复制的内容 (内部寄存器)
+inoremap <C-p> <C-r>"
+
+" ================================================================================================
+" = No Leader Keymaps =====================================
+" ================================================================================================
+" --- 开启 EasyMotion 插件 ---
+Plug 'easymotion/vim-easymotion'
+
+" 这一行是为了防止按键冲突，建议把 EasyMotion 的默认前缀改掉
+" 默认是 <Leader><Leader>，按两下空格有点慢，我们下面自定义快捷键
+" map <leader>em <Plug>(easymotion-prefix)
+
+" --- 核心配置：模拟 Flash 的 s 键跳转 ---
+
+" 1. 搜索 2 个字符跳转 (最推荐！效率最高)
+" 操作：按 s -> 输入开头两个字母 -> 屏幕出现高亮标签 -> 按标签跳转
+nmap <leader>e <Plug>(easymotion-s2)
+
+" 2. 也是用 s，但用于 Visual 模式（选中时跳转）
+xmap <leader>e <Plug>(easymotion-s2)
+
+" 3. 忽略大小写 (开启后，输入小写也能匹配大写，跳转更无脑)
+let g:EasyMotion_smartcase = 1
+
+" 调用 IntelliJ 的向下添加行动作,向下添加一个空行
+nnoremap <Leader>o :action EditorLineEnd<CR>:action EditorEnter<CR>
+" easymotion settings end ============================
+
+" nmap ge <action>(GotoNextError)
+" nmap gt <action>(GotoTest)
+" 跳到上一个方法声明
+nmap <leader>gm <action>(MethodUp)
+" 跳到这个类的抽象类上
+nmap <leader>ga <action>(GotoImplementation)
+" 跳转到函数定义
+nmap <leader>go <action>(GotoTypeDeclaration)
+nmap <leader>gd <action>(GotoDeclaration)
+" 代码操作类快捷键 =============================================
+" 打开父类的重载函数
+nmap <leader>co <action>(OverrideMethods)
+" 生成/重写方法
+nmap <leader>ci <action>(ShowIntentionActions)
+" 生成 get / set 方法
+nmap <leader>cn <action>(Generate)
+" 跳转到接口引用的地方
+nmap <leader>cf <action>(FindUsages)
+" 编辑窗口类快捷键 ==============================================
+" 关闭其他 table 页标签
+nmap <leader>wqo <action>(CloseAllEditorsButActive)
+" 消息窗口关闭快捷键
+nmap <leader>wqm <action>(HideActiveWindow)
+";
+nmap <leader>wps <action>(RedesignedRunConfigurationSelector)
+
+" ================================================================================================
+" 👻👻👻 Which-Key 👻👻👻
+" ================================================================================================
+set which-key
+set notimeout
+
+" d: diff
+nmap <leader>dd <action>(Vcs.ShowTabbedFileHistory)
+
+" f: Find/Format ⭐️
+let g:WhichKeyDesc_FindOrFormat = "<leader>f FindOrFormat"
+let g:WhichKeyDesc_FindOrFormat_FindFile = "<leader>ff FindFile"
+nmap <leader>ff <action>(GotoFile)
+
+let g:WhichKeyDesc_FindOrFormat_FindFileLocation = "<leader>fl FindFileLocation"
+nmap <leader>fl <action>(SelectInProjectView)
+
+let g:WhichKeyDesc_FindOrFormat_FindText = "<leader>ft FindText"
+nmap <leader>ft <action>(FindInPath)
+
+let g:WhichKeyDesc_FindOrFormat_Commands = "<leader>fc Commands"
+nmap <leader>fc <action>(GotoAction)
+
+let g:WhichKeyDesc_FindOrFormat_OpenedProject = "<leader>fp OpenedProject"
+nmap <leader>fp <action>(OpenProjectWindows)
+
+let g:WhichKeyDesc_FindOrFormat_Format = "<leader>fm Format"
+nmap <leader>fm <action>(ReformatCode) \| <action>(OptimizeImports)
+
+" g: Git ⭐️
+let g:WhichKeyDesc_Git = "<leader>g Git"
+let g:WhichKeyDesc_Git_RollbackHunk = "<leader>gr RollbackHunk"
+nmap <leader>gr :action Vcs.RollbackChangedLines<CR>
+
+" i: Insert ⭐️
+let g:WhichKeyDesc_InsertAfterBrackets = "<leader>i InsertAfterBrackets"
+nmap <leader>i f(a
+
+" j: add Semicolon and goto nextline⭐️
+let g:WhichKeyDesc_InsertSemicolon = "<leader>j InsertSemicolon"
+nmap <leader>j A;<ESC>o
+
+" l: lsp: Language server protocol (align with neovim)⭐️
+let g:WhichKeyDesc_LSP = "<leader>l LSP"
+let g:WhichKeyDesc_LSP_Rename = "<leader>lr Rename"
+nmap <leader>lr <action>(RenameElement)
+
+
+" n: No ⭐️
+let g:WhichKeyDesc_No_Highlight = "<leader>nl NoHighlight"
+nmap <leader>nl :nohlsearch<CR>
+
+
+" s: Show ⭐️
+let g:WhichKeyDesc_Show = "<leader>s Show"
+let g:WhichKeyDesc_Show_FileStructure = "<leader>ss ShowFileStructure"
+nmap <leader>ss <action>(FileStructurePopup)
+let g:WhichKeyDesc_Show_Bookmarks = "<leader>sb ShowBookmarks"
+nmap <leader>sb <action>(ShowBookmarks)
+let g:WhichKeyDesc_Show_ParameterInfo = "<leader>sb ShowParameterInfo"
+nmap <leader>sp <action>(ParameterInfo)
+
+" r: Run/Re ⭐️
+let g:WhichKeyDesc_RunOrRe = "<leader>r RunOrRe"
+let g:WhichKeyDesc_RunOrRe_ReRun = "<leader>rr ReRun"
+nmap <leader>rr <action>(Rerun)
+let g:WhichKeyDesc_RunOrRe_ReRunTests = "<leader>rt ReRunTests"
+nmap <leader>rt <action>(RerunTests)
+let g:WhichKeyDesc_RunOrRe_Rename = "<leader>rn Rename"
+map <leader>rn <action>(RenameElement)
+
+" w: Window ⭐️
+let g:WhichKeyDesc_Windows = "<leader>w Windows"
+let g:WhichKeyDesc_Windows_maximize = "<leader>wo maximize"
+nmap <leader>wo <action>(UnsplitAll) \| <action>(HideAllWindows)
+let g:WhichKeyDesc_Windows_splitWindowVertically = "<leader>wl splitWindowVertically"
+nmap <leader>wl <action>(Macro.SplitVertically)
+let g:WhichKeyDesc_Windows_closeActiveWindow = "<leader>wc closeActiveWindow"
+nmap <leader>wc <c-w>c
+
+" z: zip(fold) ⭐️
+let g:WhichKeyDesc_Zip = "<leader>z Zip"
+let g:WhichKeyDesc_Zip_unZipAll = "<leader>zo unZipAll"
+nmap <leader>zo <action>(ExpandAllRegions)
+let g:WhichKeyDesc_Zip_ZipAll = "<leader>zc ZipAll"
+nmap <leader>zc <action>(CollapseAllRegions)
+
+" c: Close ⭐️;
+let g:WhichKeyDesc_CloseBuffer = "<leader>q CloseBuffer"
+nmap <leader>q :q!<CR>
+
+" e: Toggle Explorer ⭐️
+let g:WhichKeyDesc_ToggleExplorerOrExtract = "<leader>e ToggleExplorer"
+
+" 代码提取重构功能（在可视模式下使用）:
+vmap <leader>em <action>(ExtractMethod)              " em: 将选中的代码提取为一个新方法。
+vmap <leader>ec <action>(IntroduceConstant)          " ec: 将选中的值提取为一个常量。
+vmap <leader>ef <action>(IntroduceField)             " ef: 将选中的值提取为一个类字段。
+vmap <leader>ev <action>(IntroduceVariable)          " ev: 将选中的值提取为一个局部变量。
+
+" 断点调试快捷  =====================================================
+" [B]reakpoint: 在当前行 开启/取消 断点
+" 场景：看到可疑代码，按一下 <leader>b，红点就出来了，再按一下就没了。
+nmap <leader>bb <action>(ToggleLineBreakpoint)
+
+" [B]reakpoints [L]ist: 查看所有断点列表
+" 场景：断点打太多找不到了？按这个弹出列表，统一管理（对应 IDE 的 Ctrl+Shift+F8）
+nmap <leader>bl <action>(ViewBreakpoints)
+
+" 在插入模式下，Ctrl+v 直接粘贴默认寄存器内容 (" 寄存器)
+inoremap <C-v> <C-r>"
+
+nmap <leader>dd "_dd
+nmap <leader>dw "_dw
+vnoremap <leader>dp "_dp;
